@@ -4,7 +4,8 @@
   "description": "Open an URL as a native application",
   "main": "app.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package": "electron-builder"
   },
   "repository": "https://github.com/cyosp/url-app",
   "homepage": "https://github.com/cyosp/url-app",
@@ -19,6 +20,17 @@
     "request": "2.88.2"
   },
   "devDependencies": {
-    "electron": "12.0.5"
+    "electron": "12.0.5",
+    "electron-builder": "22.10.5"
+  },
+  "build": {
+    "appId": "com.cyosp.url-app",
+    "linux": {
+      "target": "deb",
+      "category": "Network",
+      "desktop": {
+        "Name": "url-app"
+      }
+    }
   }
 }

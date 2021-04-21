@@ -1,0 +1,76 @@
+name: Release desktop package
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tag name
+        id: tag
+        run: echo ::set-output name=NAME::${GITHUB_REF/refs\/tags\//}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use tag name as desktop app version
+        uses: jacobtomlinson/gha-find-replace@0.1.3
+        with:
+          include: "desktop/package.json"
+          find: '"0.0.0"'
+          replace: '"${{ steps.tag.outputs.NAME }}"'
+
+      - name: Install npm modules
+        run: npm install
+        working-directory: desktop
+
+      - name: Package desktop app
+        run: npm run package
+        working-directory: desktop
+
+      - name: Create check sum file
+        run: sha512sum *.deb > url-app-SHA512.txt
+        working-directory: desktop/dist
+
+      - name: Create GitHub release
+        id: release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ steps.tag.outputs.NAME }}
+          draft: true
+
+      - name: Upload Debian package to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: desktop/dist/url-app_${{ steps.tag.outputs.NAME }}_amd64.deb
+          asset_name: url-app_${{ steps.tag.outputs.NAME }}_amd64.deb
+          asset_content_type: application/octet-stream
+
+      - name: Upload check sum file to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: desktop/dist/url-app-SHA512.txt
+          asset_name: url-app-SHA512.txt
+          asset_content_type: text/plain
+
+      - name: Publish release with notes
+        uses: cyosp/publish-release-with-notes@1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          id: ${{ steps.release.outputs.id }}
+          version: ${{ steps.tag.outputs.NAME }}
+          notes: ${{ github.workspace }}/RELEASE-NOTES.md

@@ -23,7 +23,11 @@ function exitOnClose() {
 }
 
 function loadUrl() {
-    browserWindow.loadURL(process.argv[2]);
+    let url = process.argv[1];
+    if (url === '.') {
+        url = process.argv[2];
+    }
+    browserWindow.loadURL(url);
 }
 
 function registerFaviconChangedEvent() {
