@@ -1,0 +1,24 @@
+{
+  "name": "url-app",
+  "version": "0.0.0",
+  "description": "Open an URL as a native application",
+  "main": "app.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/cyosp/url-app",
+  "homepage": "https://github.com/cyosp/url-app",
+  "author": {
+    "name": "CYOSP",
+    "email": "cyosp@cyosp.com"
+  },
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "open": "8.0.6",
+    "path": "0.12.7",
+    "request": "2.88.2"
+  },
+  "devDependencies": {
+    "electron": "12.0.5"
+  }
+}
